@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 
-class Event
+class IEvent
 {
   private:
     unsigned long start;
@@ -10,29 +10,32 @@ class Event
     bool active;
 
   public:
-    Event(int delay) : start(0), delay(delay), active(false) {}
+    IEvent(int delay) : start(0), delay(delay), active(false) {}
 
     inline void enable()
     {
         setEnabled(true);
     }
 
-    inline void disable()
+    inline IEvent& disable()
     {
         setEnabled(false);
+        return *this;
     }
 
-    inline void abort()
+    inline IEvent& abort()
     {
         setEnabled(false);
+        return *this;
     }
 
-    inline void setEnabled(bool enabled)
+    inline IEvent& setEnabled(bool enabled)
     {
         active = enabled;
+        return *this;
     }
 
-    inline void schedule(int delay)
+    inline IEvent& schedule(int delay)
     {
         if (!active)
         {
@@ -40,21 +43,24 @@ class Event
             delay = delay;
             setEnabled(true);
         }
+        return *this;
     }
 
-    inline void schedule()
+    inline IEvent& schedule()
     {
         if (!active)
         {
             start = millis();
             setEnabled(true);
         }
+        return *this;
     }
 
-    inline void reschedule()
+    inline IEvent& reschedule()
     {
         start = millis();
         setEnabled(true);
+        return *this;
     }
 
     inline bool isEnabled()
@@ -67,7 +73,7 @@ class Event
         return delay;
     }
 
-    void update()
+    IEvent& update()
     {
         if (active)
         {
@@ -77,6 +83,7 @@ class Event
                 setEnabled(false);
             }
         }
+        return *this;
     }
 
     virtual void trigger() = 0;
